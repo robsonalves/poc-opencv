@@ -40,9 +40,37 @@ for fid in frames_ids:
 print(np.mean([1,3,5,6,8,9]))
 print(np.median([[1,3,5,6,8,9]]))
 
-
+#Background Isolation
 median_frame = np.median(frames, axis = 0).astype(dtype=np.uint8)
-print(median_frame)
+# print(median_frame)
+# cv2.imshow('Median Frame', median_frame)
+# cv2.waitKey(0)
 
-cv2.imshow('Median Frame', median_frame)
-cv2.waitKey(0)
+cv2.imwrite('model_median_frame.jpg', median_frame)
+
+# GRAY SCALE
+cap.set(cv2.CAP_PROP_POS_FRAMES,0)
+gray_median_frame = cv2.cvtColor(median_frame, cv2.COLOR_BGR2GRAY)
+# cv2.imshow('Gray', gray_median_frame)
+# cv2.waitKey(0)
+
+while(True):
+    has_frame, frame = cap.read()
+
+    if not has_frame:
+        print('End of the video')
+        break
+
+    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    dframe = cv2.absdiff(frame_gray, gray_median_frame)
+    # if Pixel intensity is greater than the set threshold, value set to 255, else set to 0(black)
+    # th, dframe = cv2.threshold(dframe, 70, 255,cv2.THRESH_BINARY)
+    th, dframe = cv2.threshold(dframe, 0, 255,cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+    print(th)
+    cv2.imshow('Frame', dframe)
+    writer.write(dframe)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
