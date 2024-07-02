@@ -5,3 +5,5 @@ torchvision
 numpy
 matplotlib
 pillow
+numpy
+opencv-python

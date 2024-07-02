@@ -3,11 +3,12 @@ import numpy as np
 import tensorflow as tf
 
 # Load the pre-trained model
-model = tf.saved_model.load("ssd_mobilenet_v2_fpnlite_320x320/saved_model")
+model_path = "ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8/saved_model"
+model = tf.saved_model.load(model_path)
 
 # Load the labels
 labels = {}
-with open('coco_labels.txt', 'r') as f:
+with open('mscoco_label_map.pbtxt', 'r') as f:
     for line in f:
         index, label = line.strip().split(':')
         labels[int(index)] = label
@@ -24,9 +25,15 @@ def detect_objects(frame):
 # Open the camera
 cap = cv2.VideoCapture(0)
 
+if not cap.isOpened():
+    print("Error: Could not open the camera.")
+    exit()
+
 while True:
-    # Capture frame-by-frame
     ret, frame = cap.read()
+    if not ret:
+        print("Error: Failed to capture image")
+        break
 
     # Convert frame to RGB
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -50,11 +57,8 @@ while True:
 
     # Display the resulting frame
     cv2.imshow('Object Detection', frame)
-
-    # Break the loop on 'q' key press
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-# When everything is done, release the capture
 cap.release()
 cv2.destroyAllWindows()
