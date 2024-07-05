@@ -10,3 +10,7 @@ opencv-python
 opencv-contrib-python
 pandas
 matplotlib
+ultralytics==8.0.0
+torch
+torchvision
+torchaudio
